@@ -21,7 +21,7 @@ class GetAllRequests(Resource):
 
         db_obj = DBHandler()
         response = db_obj.get_all_user_requests()
-        return make_response(jsonify({'message': response}), 200)
+        return make_response(jsonify({'requests': response}), 200)
 
 
 class ApproveUserRequest(Resource):

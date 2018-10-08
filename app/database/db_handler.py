@@ -64,9 +64,10 @@ class DBHandler():
                 self.cur.execute("INSERT INTO users(email,username,user_password,isadmin) VALUES(%s,%s,%s,%s)",
                                  (user.email, user.username, user.password, user.isAdmin))
                 return True
-        except psycopg2.DatabaseError:
+        except psycopg2.DatabaseError as e:
             if self.conn:
                 self.conn.rollback()
+            raise e
         finally:
             if self.conn:
                 self.conn.close
@@ -82,9 +83,10 @@ class DBHandler():
             userDict = {"username": user[0],
                         "isadmin": user[1], "password": user[2]}
             return userDict
-        except psycopg2.DatabaseError:
+        except psycopg2.DatabaseError as e:
             if self.conn:
                 self.conn.close
+            raise e
         finally:
             if self.conn:
                 self.conn.close
@@ -93,32 +95,35 @@ class DBHandler():
         try:
             self.cur.execute("INSERT INTO requests(username,header,details,approved,resolved) VALUES(%s,%s,%s,%s,%s)",
                              (request.username, request.header, request.details, request.approved, request.resolved))
-        except psycopg2.DatabaseError:
+        except psycopg2.DatabaseError as e:
             if self.conn:
                 self.conn.close
+            raise e
         finally:
             if self.conn:
                 self.conn.close
 
     def get_user_requests(self, username):
         try:
-            statement = "SELECT header,details,approved,resolved FROM requests WHERE username='"+username+"';"
+            statement = "SELECT requestid,header,details,approved,resolved FROM requests WHERE username='"+username+"';"
             self.cur.execute(statement)
             rows = self.cur.fetchall()
             requestList = []
             requestDict = {}
             for row in rows:
-                requestDict['header'] = row[0]
-                requestDict['details'] = row[1]
-                requestDict['approved'] = row[2]
-                requestDict['resolved'] = row[3]
+                requestDict['id'] = row[0]
+                requestDict['header'] = row[1]
+                requestDict['details'] = row[2]
+                requestDict['approved'] = row[3]
+                requestDict['resolved'] = row[4]
                 requestList.append(requestDict)
                 requestDict = {}
 
             return requestList
-        except psycopg2.DatabaseError:
+        except psycopg2.DatabaseError as e:
             if self.conn:
                 self.conn.close
+            raise e
         finally:
             if self.conn:
                 self.conn.close
@@ -126,17 +131,18 @@ class DBHandler():
     def get_user_request(self, username, requestid):
         try:
             self.cur.execute(
-                "SELECT header,details,approved,resolved FROM requests WHERE username=%s AND requestid=%s", (username, requestid))
+                "SELECT requestid,header,details,approved,resolved FROM requests WHERE username=%s AND requestid=%s", (username, requestid))
             req = self.cur.fetchone()
             if req is None:
                 return None
 
-            requestDict = {"header": req[0], "details": req[1],
-                           "approved": req[2], "resolved": req[3]}
+            requestDict = {"id": req[0], "header": req[1], "details": req[2],
+                           "approved": req[3], "resolved": req[4]}
             return requestDict
-        except psycopg2.DatabaseError:
+        except psycopg2.DatabaseError as e:
             if self.conn:
                 self.conn.close
+            raise e
         finally:
             if self.conn:
                 self.conn.close
@@ -153,33 +159,36 @@ class DBHandler():
             requestDict = {"header": req[0], "details": req[1],
                            "approved": req[2], "resolved": req[3]}
             return requestDict
-        except psycopg2.DatabaseError:
+        except psycopg2.DatabaseError as e:
             if self.conn:
                 self.conn
+            raise e
         finally:
             if self.conn:
                 self.conn.close
 
     def get_all_user_requests(self):
         try:
-            statement = "SELECT username,header,details,approved,resolved FROM requests;"
+            statement = "SELECT requestid,username,header,details,approved,resolved FROM requests;"
             self.cur.execute(statement)
             rows = self.cur.fetchall()
             requestList = []
             requestDict = {}
             for row in rows:
-                requestDict['username'] = row[0]
-                requestDict['header'] = row[1]
-                requestDict['details'] = row[2]
-                requestDict['approved'] = row[3]
-                requestDict['resolved'] = row[4]
+                requestDict['id'] = row[0]
+                requestDict['username'] = row[1]
+                requestDict['header'] = row[2]
+                requestDict['details'] = row[3]
+                requestDict['approved'] = row[4]
+                requestDict['resolved'] = row[5]
                 requestList.append(requestDict)
                 requestDict = {}
 
             return requestList
-        except psycopg2.DatabaseError:
+        except psycopg2.DatabaseError as e:
             if self.conn:
                 self.conn.close
+            raise e
         finally:
             if self.conn:
                 self.conn.close
@@ -196,9 +205,10 @@ class DBHandler():
             requestDict = {"username": req[0], "header": req[1], "details": req[2],
                            "approved": req[3], "resolved": req[4]}
             return requestDict
-        except psycopg2.DatabaseError:
+        except psycopg2.DatabaseError as e:
             if self.conn:
                 self.conn
+            raise e
         finally:
             if self.conn:
                 self.conn.close
@@ -215,9 +225,10 @@ class DBHandler():
             requestDict = {"username": req[0], "header": req[1], "details": req[2],
                            "approved": req[3], "resolved": req[4]}
             return requestDict
-        except psycopg2.DatabaseError:
+        except psycopg2.DatabaseError as e:
             if self.conn:
                 self.conn.rollback()
+            raise e
         finally:
             if self.conn:
                 self.conn.close
@@ -228,9 +239,10 @@ class DBHandler():
                 "SELECT approved FROM requests WHERE requestid=%s", [requestid])
             row = self.cur.fetchone()
             return row[0]
-        except psycopg2.DatabaseError:
+        except psycopg2.DatabaseError as e:
             if self.conn:
                 self.conn.rollback()
+            raise e
         finally:
             if self.conn:
                 self.conn.close
@@ -247,9 +259,10 @@ class DBHandler():
             requestDict = {"username": req[0], "header": req[1], "details": req[2],
                            "approved": req[3], "resolved": req[4]}
             return requestDict
-        except psycopg2.DatabaseError:
+        except psycopg2.DatabaseError as e:
             if self.conn:
                 self.conn.rollback()
+            raise e
         finally:
             if self.conn:
                 self.conn.close()
@@ -257,9 +270,10 @@ class DBHandler():
     def delete_user(self, username):
         try:
             self.cur.execute("DELETE FROM users WHERE username=%s", [username])
-        except psycopg2.DatabaseError:
+        except psycopg2.DatabaseError as e:
             if self.conn:
                 self.conn.rollback()
+            raise e
         finally:
             if self.conn:
                 self.conn.close()

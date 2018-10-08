@@ -50,7 +50,7 @@ class MakeRequests(Resource):
         if len(response) <= 0:
             return make_response(jsonify({'message': 'no such entry found'}), 400)
 
-        return make_response(jsonify({'message': response}), 200)
+        return make_response(jsonify({'requests': response}), 200)
 
 
 class ManageUserRequest(Resource):
@@ -64,7 +64,7 @@ class ManageUserRequest(Resource):
         if response is None:
             return make_response(jsonify({'message': 'no such entry found'}), 400)
 
-        return make_response(jsonify({'message': response}), 200)
+        return make_response(jsonify({'request': response}), 200)
 
     @jwt_required
     def put(self, requestid):

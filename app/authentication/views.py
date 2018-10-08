@@ -46,11 +46,14 @@ class Login(Resource):
         email = data['email']
         password = data['password']
 
-        if not isString(email) or not isString(password):
-            return make_response(jsonify({'message': 'please insert correct values'}), 400)
+        email = str(email)
+        password = str(password)
 
         if not empty_string_catcher(email)or not empty_string_catcher(password):
             return make_response(jsonify({'message': 'please fill all fields'}), 400)
+
+        if not isString(email) or not isString(password):
+            return make_response(jsonify({'message': 'please insert correct values'}), 400)
 
         if not email_validator(email):
             return make_response(jsonify({'message': 'malformed email'}), 400)
