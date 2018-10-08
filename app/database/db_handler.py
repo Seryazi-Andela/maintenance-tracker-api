@@ -4,8 +4,10 @@ import psycopg2
 class DBHandler():
     def __init__(self):
         try:
+            # self.conn = psycopg2.connect(
+            #     "dbname=maintenance_tracker_db user=postgres password=seryazi")
             self.conn = psycopg2.connect(
-                "dbname=maintenance_tracker_db user=postgres password=seryazi")
+                "postgres://anhiygxbsqesuk:9b1df31160c1c12b69626e8ec24492de25b88edf3598660a888e713ff7cdb21c@ec2-54-225-68-133.compute-1.amazonaws.com:5432/d3gqpn50u58d1e")
             self.conn.autocommit = True
             self.cur = self.conn.cursor()
         except psycopg2.DatabaseError as e:
